@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Πίνακας Σημάτων – ένα φανάρι για κάθε θέμα</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#f1f3f5;--surface:#ffffff;--ink:#14202b;--mute:#5b6975;--line:#d5dbe0;
+  --red:#d92d3a;--yellow:#e3a008;--green:#1f9d5c;--unlit:#e6eaed;
+  --head:"Roboto Condensed","Arial Narrow",Arial,sans-serif;--body:"Roboto",system-ui,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f161d;--surface:#17212a;--ink:#e8edf1;--mute:#93a1ad;--line:#27343f;--red:#ff4d58;--yellow:#ffc233;--green:#35c47a;--unlit:#212d37;}}
+:root[data-theme="dark"]{--bg:#0f161d;--surface:#17212a;--ink:#e8edf1;--mute:#93a1ad;--line:#27343f;--red:#ff4d58;--yellow:#ffc233;--green:#35c47a;--unlit:#212d37;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 var(--body)}
+main{max-width:880px;margin:0 auto;padding:20px 16px 64px}
+h1{font:700 clamp(32px,7vw,52px)/1.05 var(--head);margin:8px 0 6px}
+.sub{color:var(--mute);margin:0 0 18px;max-width:62ch}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+.legend span{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px 5px 6px;font-weight:500}
+.dot{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;font:700 13px var(--head);color:#fff;font-style:normal}
+.d1{background:var(--red)}.d2{background:var(--yellow);color:#1b1500}.d3{background:var(--green)}
+.meter{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--unlit);margin:0 0 6px}
+.meter i{display:block;height:100%;transition:width .25s}
+.counts{display:flex;gap:16px;flex-wrap:wrap;color:var(--mute);font-size:14px;margin-bottom:18px}
+.counts b{color:var(--ink);font-family:var(--head);font-size:18px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.chip{font:500 14px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 13px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:focus-visible,.lamp:focus-visible,.row:focus-visible,input:focus-visible,.btn:focus-visible,summary:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.btn{font:500 14px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:8px;cursor:pointer}
+.spacer{flex:1}
+.nt{margin:4px 0 16px}
+.nt summary{display:inline-block;list-style:none;cursor:pointer;background:var(--ink);color:var(--bg);font-weight:500}
+.nt summary::-webkit-details-marker{display:none}
+form.add{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding:14px;border:1px dashed var(--line);border-radius:10px}
+input{font:400 16px var(--body);padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-width:0;flex:1 1 200px}
+input.em{flex:0 0 70px;text-align:center}
+.row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;flex-wrap:wrap}
+.row[data-v="1"]{border-left-color:var(--red)}.row[data-v="2"]{border-left-color:var(--yellow)}.row[data-v="3"]{border-left-color:var(--green)}
+.row.hot{border-color:var(--ink);border-left-color:inherit}
+.ico{font-size:26px;width:34px;text-align:center}
+.txt{flex:1 1 200px;min-width:0}
+.name{font-weight:500}
+.note{color:var(--mute);font-size:14px}
+.status{font:700 15px var(--head);min-width:96px;text-align:right;color:var(--mute)}
+.row[data-v="1"] .status{color:var(--red)}.row[data-v="2"] .status{color:var(--yellow)}.row[data-v="3"] .status{color:var(--green)}
+.lamps{display:flex;gap:8px;background:#0b1117;padding:6px 8px;border-radius:999px}
+.lamp{width:38px;height:38px;border-radius:50%;border:2px solid transparent;background:#26333e;color:#8798a6;font:700 18px var(--head);cursor:pointer;transition:transform .1s,box-shadow .15s}
+.lamp:active{transform:scale(.92)}
+.lamp[data-l="1"][aria-pressed="true"]{background:var(--red);color:#fff;box-shadow:0 0 14px 2px var(--red)}
+.lamp[data-l="2"][aria-pressed="true"]{background:var(--yellow);color:#1b1500;box-shadow:0 0 14px 2px var(--yellow)}
+.lamp[data-l="3"][aria-pressed="true"]{background:var(--green);color:#fff;box-shadow:0 0 14px 2px var(--green)}
+.x{border:0;background:none;color:var(--mute);cursor:pointer;font-size:20px;padding:0 4px}
+.hint{color:var(--mute);font-size:14px;margin-top:20px}
+.empty{color:var(--mute);padding:10px 2px}
+@media (max-width:520px){.status{display:none}.lamps{margin-left:auto}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Πίνακας Σημάτων</h1>
+  <p class="sub">Ένα φανάρι για κάθε θέμα: είμαι ανοιχτός σε αυτό; Βάλε Όχι, Με προσοχή ή Ναι. Οι επιλογές σου σώζονται σε αυτόν τον browser.</p>
+
+  <div class="legend">
+    <span><i class="dot d1">1</i>Όχι</span>
+    <span><i class="dot d2">2</i>Με προσοχή</span>
+    <span><i class="dot d3">3</i>Ναι</span>
+    <span><i class="dot" style="background:var(--unlit);color:var(--mute)">0</i>Καθαρό</span>
+  </div>
+
+  <div class="meter" id="meter" aria-hidden="true"></div>
+  <div class="counts" id="counts"></div>
+
+  <div class="bar" id="lightbar" role="group" aria-label="Φίλτρο φαναριού"></div>
+  <div class="bar"><span class="spacer"></span><button class="btn" id="copy">Αντιγραφή σύνοψης</button><button class="btn" id="reset">Μηδενισμός</button></div>
+
+  <details class="nt" id="nt"><summary class="btn">+ Φτιάξε δικό σου φανάρι θέματος</summary>
+    <form class="add" id="add">
+      <input class="em" id="newem" placeholder="✨" maxlength="4" aria-label="Εικονίδιο">
+      <input id="newname" placeholder="Θέμα (π.χ. Μαγειρική, Χρήματα, Γυμναστική)…" maxlength="60" aria-label="Όνομα θέματος">
+      <input id="newnote" placeholder="Σύντομη περιγραφή (προαιρετικά)…" maxlength="80" aria-label="Περιγραφή">
+      <button class="btn" type="submit">Δημιουργία</button>
+    </form>
+  </details>
+
+  <div id="list"></div>
+  <p class="hint">Συμβουλή: πέρασε το ποντίκι ή εστίασε σε μια γραμμή και πάτα 1, 2 ή 3 στο πληκτρολόγιο. Το 0 την καθαρίζει.</p>
+</main>
+
+<script>
+const BASE=[
+["✈️","Ταξίδια","Εκδρομές, εξερεύνηση, άγνωστα μέρη"],
+["🚗","Όχημα","Αυτοκίνητο, μηχανή, ποδήλατο, μετακινήσεις"],
+["📱","Μέσα κοινωνικής δικτύωσης","Instagram, TikTok, X, Facebook"],
+["🎵","Μουσική","Ακούσματα, συναυλίες, παίξιμο"],
+["📖","Διάβασμα","Βιβλία, άρθρα, μελέτη"],
+["🎬","Ταινίες","Κινηματογράφος, σειρές, ντοκιμαντέρ"],
+["💭","Συναισθήματα","Να νιώθεις και να τα εκφράζεις"],
+["🔬","Επιστήμη","Έρευνα, ανακαλύψεις, γνώση"],
+["🙏","Θρησκεία","Πίστη, τελετουργίες, παραδόσεις"],
+["💻","Τεχνολογία","Εφαρμογές, AI, συσκευές"],
+["🌿","Φιλικό προς τη φύση και το περιβάλλον","Ανακύκλωση, φύση, βιώσιμες συνήθειες"],
+["🎮","Παιχνίδι","Βιντεοπαιχνίδια, επιτραπέζια, διασκέδαση"],
+["💬","Συζήτηση","Κουβέντα, ανταλλαγή απόψεων"],
+["🧘","Διαλογισμός","Ηρεμία, αναπνοή, εσωτερική σιωπή"]
+];
+const NAMES={0:"Αβαθμολόγητο",1:"Όχι",2:"Με προσοχή",3:"Ναι"};
+const KEY="signal-board-v2";
+let S={r:{},custom:[]},light="all",hot=null;
+try{const j=JSON.parse(localStorage.getItem(KEY)||"null");if(j&&j.r)S=j;}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function all(){return BASE.map(x=>({e:x[0],n:x[1],d:x[2],custom:false})).concat(S.custom.map(x=>({e:x.e||"✨",n:x.n,d:x.d||"Δικό μου θέμα",custom:true})));}
+function chips(el,opts,cur,fn){
+  el.innerHTML=opts.map(o=>`<button class="chip" aria-pressed="${o[0]===cur}" data-k="${o[0]}">${esc(o[1])}</button>`).join("");
+  el.onclick=e=>{const b=e.target.closest("button");if(b){fn(b.dataset.k);render();}};
+}
+function render(){
+  const a=all(),cnt=[0,0,0,0];a.forEach(i=>cnt[S.r[i.n]||0]++);
+  const tot=a.length||1;
+  document.getElementById("meter").innerHTML=[1,2,3].map(v=>`<i style="width:${cnt[v]/tot*100}%;background:var(--${["","red","yellow","green"][v]})"></i>`).join("");
+  document.getElementById("counts").innerHTML=`<span><b>${cnt[1]}</b> όχι</span><span><b>${cnt[2]}</b> με προσοχή</span><span><b>${cnt[3]}</b> ναι</span><span><b>${cnt[0]}</b> αβαθμολόγητα</span>`;
+  chips(document.getElementById("lightbar"),[["all","Όλα"],["1","1 Όχι"],["2","2 Με προσοχή"],["3","3 Ναι"],["0","Αβαθμολόγητα"]],light,k=>light=k);
+  const rows=a.filter(i=>light==="all"||String(S.r[i.n]||0)===light);
+  document.getElementById("list").innerHTML=rows.map(i=>{const v=S.r[i.n]||0;
+    return `<div class="row" tabindex="0" data-id="${esc(i.n)}" data-v="${v}">
+      <span class="ico" aria-hidden="true">${esc(i.e)}</span>
+      <div class="txt"><div class="name">${esc(i.n)}</div><div class="note">${esc(i.d)}</div></div>
+      <span class="status">${NAMES[v]}</span>
+      <div class="lamps" role="group" aria-label="Φανάρι για ${esc(i.n)}">${[1,2,3].map(l=>`<button class="lamp" data-l="${l}" aria-pressed="${v===l}" aria-label="${NAMES[l]}" title="${NAMES[l]} (${l})">${l}</button>`).join("")}</div>
+      ${i.custom?`<button class="x" data-del="1" aria-label="Διαγραφή ${esc(i.n)}" title="Διαγραφή">×</button>`:""}
+    </div>`}).join("")||`<div class="empty">Κανένα θέμα δεν ταιριάζει με αυτό το φίλτρο.</div>`;
+  if(hot){const r=[...document.querySelectorAll(".row")].find(x=>x.dataset.id===hot);if(r)r.classList.add("hot");}
+}
+function setV(k,v){if(v===0)delete S.r[k];else S.r[k]=v;save();render();}
+const list=document.getElementById("list");
+list.addEventListener("click",e=>{
+  const row=e.target.closest(".row");if(!row)return;const k=row.dataset.id;
+  const l=e.target.closest(".lamp");
+  if(l){const v=+l.dataset.l;setV(k,(S.r[k]===v)?0:v);return;}
+  if(e.target.closest("[data-del]")){S.custom=S.custom.filter(x=>x.n!==k);delete S.r[k];save();render();}
+});
+list.addEventListener("mouseover",e=>{const r=e.target.closest(".row");if(r)hot=r.dataset.id;});
+list.addEventListener("focusin",e=>{const r=e.target.closest(".row");if(r)hot=r.dataset.id;});
+list.addEventListener("mouseleave",()=>{hot=null;});
+document.addEventListener("keydown",e=>{
+  if(/INPUT|SELECT|TEXTAREA|SUMMARY/.test(e.target.tagName)||e.ctrlKey||e.metaKey||e.altKey)return;
+  if(!"0123".includes(e.key)||e.key.length!==1)return;
+  const f=e.target.closest&&e.target.closest(".row");const k=f?f.dataset.id:hot;
+  if(!k)return;e.preventDefault();
+  const el=document.activeElement&&document.activeElement.closest&&document.activeElement.closest(".row");
+  const refocus=el?el.dataset.id:null;
+  setV(k,+e.key);
+  if(refocus){const r=[...document.querySelectorAll(".row")].find(x=>x.dataset.id===refocus);if(r)r.focus();}
+});
+document.getElementById("add").addEventListener("submit",e=>{
+  e.preventDefault();
+  const n=document.getElementById("newname").value.trim(),d=document.getElementById("newnote").value.trim(),em=document.getElementById("newem").value.trim()||"✨";
+  if(!n||all().some(x=>x.n.toLowerCase()===n.toLowerCase()))return;
+  S.custom.push({n,d,e:em});save();
+  ["newname","newnote","newem"].forEach(i=>document.getElementById(i).value="");
+  light="all";document.getElementById("nt").open=false;render();
+  const rs=document.querySelectorAll(".row");if(rs.length)rs[rs.length-1].scrollIntoView({behavior:"smooth",block:"center"});
+});
+document.getElementById("reset").onclick=()=>{if(confirm("Να μηδενιστούν όλα τα φανάρια και να διαγραφούν τα δικά σου θέματα;")){S={r:{},custom:[]};save();render();}};
+document.getElementById("copy").onclick=async e=>{
+  const g={1:[],2:[],3:[]};all().forEach(i=>{const v=S.r[i.n];if(v)g[v].push(i.n);});
+  const t=`ΟΧΙ: ${g[1].join(", ")||"-"}\nΜΕ ΠΡΟΣΟΧΗ: ${g[2].join(", ")||"-"}\nΝΑΙ: ${g[3].join(", ")||"-"}`;
+  const b=e.target;try{await navigator.clipboard.writeText(t);b.textContent="Αντιγράφηκε";}catch(x){b.textContent="Η αντιγραφή δεν επιτρέπεται εδώ";}
+  setTimeout(()=>b.textContent="Αντιγραφή σύνοψης",1500);
+};
+render();
+</script>
+</body>
+</html>
